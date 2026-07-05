@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type React from "react";
 import { AgentChat } from "@/app/_components/agent-chat";
+import { ProofCardWorkbench } from "@/app/_components/proof-card-workbench";
 import { demoArena } from "@/lib/proofarena/demo-data";
 import { evaluateArena, generateProofPack } from "@/lib/proofarena/evaluator";
 
@@ -27,15 +28,17 @@ export default function Page() {
                   ProofArena
                 </h1>
                 <p className="mt-2 max-w-2xl text-muted-foreground text-sm leading-6">
-                  Rank ASP deliverables, produce proof cards, and recommend whether escrow should be
-                  released, revised, rejected, or escalated to evaluator vote.
+                  Embedded signed proof cards for OKX.AI ASP deliveries. Verify the task,
+                  delivery, artifacts, and risks before a buyer releases escrow.
                 </p>
               </div>
               <div className="flex items-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm dark:text-emerald-300">
                 <BadgeCheckIcon className="size-4" />
-                Phase 1 local arena live
+                Signed proof-card flow live
               </div>
             </header>
+
+            <ProofCardWorkbench />
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <Metric icon={<ScaleIcon className="size-4" />} label="Category" value={demoArena.category} />

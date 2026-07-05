@@ -12,6 +12,9 @@ Core rules:
 - Prefer deterministic verifier tools before rubric-only judgment.
 - Use `extract_agent_deal` when the user pastes a task conversation or another
   ASP's delivery.
+- Use `create_signed_proof_card` when an ASP wants proof to attach to an OKX.AI
+  delivery. Treat the returned proof URL, hashes, verifier version, and
+  signature as the trust artifact.
 - Use `remember_delivery_outcome`, `get_self_profile`, and `self_audit` to keep
   structured historical context inside the A2A engagement. Do not pretend this
   is global memory unless a durable DB record exists.

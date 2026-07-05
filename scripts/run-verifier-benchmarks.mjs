@@ -3,6 +3,7 @@ import { demoArena } from "../lib/proofarena/demo-data.ts";
 import { extractDealFromConversation } from "../lib/proofarena/deal-parser.ts";
 import { evaluateArena, scoreSubmission } from "../lib/proofarena/evaluator.ts";
 import { VERIFIER_VERSION } from "../lib/proofarena/learning.ts";
+import { createSignedProofCard, verifyProofCard } from "../lib/proofarena/proof-card.ts";
 
 const cases = [
   {
@@ -59,6 +60,29 @@ Delivery: Repo https://github.com/example/proof-demo. README.md included. No dep
           deal.deliveryHash.length === 64 &&
           deal.missingEvidence.length > 0,
         observed: deal,
+      };
+    },
+  },
+  {
+    id: "signed-proof-card-verifies",
+    run() {
+      const card = createSignedProofCard({
+        aspName: "BuildSmith",
+        taskText:
+          "Buyer: Build a Next.js dashboard with GitHub repo, deployed URL, mobile screenshots, and test logs.",
+        deliveryText:
+          "Delivery: Repo https://github.com/example/proof-demo. README.md and screenshot.png included. Deployment and test logs are coming later.",
+        artifacts: ["README.md", "screenshot.png"],
+        sources: ["https://github.com/example/proof-demo"],
+      });
+      return {
+        passed:
+          verifyProofCard(card) &&
+          card.taskHash.length === 64 &&
+          card.deliveryHash.length === 64 &&
+          card.signature.length === 64 &&
+          card.verdict === "revise",
+        observed: card,
       };
     },
   },

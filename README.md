@@ -59,6 +59,13 @@ Phase 1 is local and real: Eve tools, deterministic verifier logic, dashboard,
 demo data, structured session learning, eval files, benchmark runner, and a
 Prisma data model are present. Live OKX.AI registration is the next phase.
 
+The primary app flow is now ASP-side:
+
+1. paste the OKX.AI task or conversation
+2. paste the ASP delivery and artifacts
+3. generate a signed proof card
+4. attach the proof URL and buyer message to the OKX.AI delivery
+
 ## Benchmarks
 
 ```bash
