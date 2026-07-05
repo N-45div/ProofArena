@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Arena {
+  id                 String       @id @default(cuid())
+  title              String
+  buyer              String
+  category           String
+  acceptanceCriteria String
+  status             String       @default("open")
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  submissions        Submission[]
+  proofCards         ProofCard[]
+  votes              EvaluatorVote[]
+}
+
+model Submission {
+  id          String        @id @default(cuid())
+  arenaId     String
+  aspName     String
+  category    String
+  title       String
+  summary     String
+  sources     String
+  artifacts   String
+  claims      String
+  submittedAt DateTime      @default(now())
+  arena       Arena         @relation(fields: [arenaId], references: [id])
+  verifierRun VerifierRun?
+}
+
+model VerifierRun {
+  id           String     @id @default(cuid())
+  submissionId String     @unique
+  score        Int
+  verdict      String
+  checks       String
+  risks        String
+  createdAt    DateTime   @default(now())
+  submission   Submission @relation(fields: [submissionId], references: [id])
+}
+
+model ProofCard {
+  id             String   @id @default(cuid())
+  arenaId        String
+  aspName        String
+  score          Int
+  verdict        String
+  proofPackJson  String
+  createdAt      DateTime @default(now())
+  arena          Arena    @relation(fields: [arenaId], references: [id])
+}
+
+model EvaluatorVote {
+  id          String   @id @default(cuid())
+  arenaId     String
+  evaluator   String
+  submissionId String
+  rationale   String
+  createdAt   DateTime @default(now())
+  arena       Arena    @relation(fields: [arenaId], references: [id])
+}
