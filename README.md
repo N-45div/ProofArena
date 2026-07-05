@@ -24,6 +24,8 @@ service is live.
 ## Stack
 
 - Eve agent runtime
+- Eve durable session state for active A2A memory
+- Eve evals for regression benchmarks
 - TypeScript and Node 24
 - Next.js dashboard and Eve web channel
 - AI SDK OpenRouter/OpenAI-compatible model adapter
@@ -45,11 +47,25 @@ variables are configured.
 ## Demo Prompt
 
 ```text
-Use the demo arena to rank all ASP submissions, generate a proof pack, and tell the buyer whether escrow should be released.
+I am an OKX.AI buyer. I asked an ASP to build a Next.js landing page.
+The ASP promised a repo, deployment, mobile screenshots, and test logs.
+It sent a repo and screenshots, but no deployment or test logs.
+Should I release escrow?
 ```
 
 ## Current Phase
 
 Phase 1 is local and real: Eve tools, deterministic verifier logic, dashboard,
-demo data, and a Prisma data model are present. Live OKX.AI registration is the
-next phase.
+demo data, structured session learning, eval files, benchmark runner, and a
+Prisma data model are present. Live OKX.AI registration is the next phase.
+
+## Benchmarks
+
+```bash
+npm run benchmark:verifier
+npm run eve:eval:list
+```
+
+`benchmark:verifier` is deterministic and writes local-only results under
+`.internal/benchmark-runs/`. Eve evals exercise the agent path and require the
+configured model provider.

@@ -199,6 +199,27 @@ function scoreCategoryFit(submission: ProofSubmission): CheckResult {
 
 function collectRisks(submission: ProofSubmission, checks: readonly CheckResult[]) {
   const risks = checks.filter((check) => !check.passed).map((check) => check.label);
+  const text = `${submission.title} ${submission.summary} ${submission.claims.join(" ")}`.toLowerCase();
+
+  if (
+    submission.category === "software" &&
+    /\b(no|missing|without|did not include|coming later)\b.{0,48}\b(deploy|deployment|deployed url|endpoint)\b/.test(text)
+  ) {
+    risks.push("Missing deployment proof");
+  }
+  if (
+    submission.category === "software" &&
+    /\b(no|missing|without|did not include|coming later)\b.{0,48}\b(test|tests|test log|logs)\b/.test(text)
+  ) {
+    risks.push("Missing test evidence");
+  }
+  if (
+    submission.category === "onchain" &&
+    /\b(no|missing|without)\b.{0,48}\b(tx|hash|explorer|address)\b/.test(text)
+  ) {
+    risks.push("Missing onchain proof");
+  }
+
   if (submission.sources.length === 0) {
     risks.push("No external evidence supplied");
   }

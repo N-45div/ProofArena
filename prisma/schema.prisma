@@ -67,3 +67,28 @@ model EvaluatorVote {
   createdAt   DateTime @default(now())
   arena       Arena    @relation(fields: [arenaId], references: [id])
 }
+
+model LearningEvent {
+  id             String   @id @default(cuid())
+  aspName        String
+  category       String
+  taskHash       String
+  deliveryHash   String
+  verifierVersion String
+  verdict        String
+  score          Int
+  buyerOutcome   String?
+  disputeOutcome String?
+  lessons        String
+  createdAt      DateTime @default(now())
+}
+
+model BenchmarkRun {
+  id             String   @id @default(cuid())
+  suite          String
+  verifierVersion String
+  passed         Int
+  failed         Int
+  summaryJson    String
+  createdAt      DateTime @default(now())
+}

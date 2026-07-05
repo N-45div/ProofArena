@@ -6,6 +6,7 @@ flowchart LR
   Order --> Agent[ProofArena Eve Agent]
   Agent --> Skills[Eve skills]
   Agent --> Tools[Verifier tools]
+  Agent --> Memory[Eve session memory]
   Tools --> Score[Scorecards]
   Score --> Vote{Close race?}
   Vote -->|No| Pack[Proof pack]
@@ -20,6 +21,21 @@ flowchart LR
 
 Eve owns the reasoning loop, skills, tools, schedules, and web channel.
 ProofArena does not hand-roll an agent orchestrator.
+
+## Self-Learning Boundary
+
+ProofArena does not use generic RAG as a reputation source. It learns through
+structured events:
+
+- extracted deal hashes
+- verifier scores and verdicts
+- buyer outcomes
+- dispute outcomes
+- benchmark self-audits
+
+Eve `defineState` stores active A2A engagement memory. Prisma models
+`LearningEvent` and `BenchmarkRun` define the long-term store for cross-session
+history.
 
 ## Product Boundary
 

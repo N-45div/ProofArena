@@ -7,7 +7,10 @@
   "scripts": {
     "dev": "next dev",
     "eve:info": "eve info",
+    "eve:eval": "eve eval",
+    "eve:eval:list": "eve eval --list",
     "eve:build": "eve build",
+    "benchmark:verifier": "node scripts/run-verifier-benchmarks.mjs",
     "build": "next build",
     "start": "next start",
     "prisma:generate": "prisma generate",
