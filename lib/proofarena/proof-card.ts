@@ -1,8 +1,9 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { extractDealFromConversation } from "./deal-parser.ts";
-import { scoreSubmission, type ProofSubmission, type ScoreCard } from "./evaluator.ts";
+import { scoreSubmission, type CheckResult, type ProofSubmission, type ScoreCard } from "./evaluator.ts";
 import { VERIFIER_VERSION } from "./learning.ts";
+import { verifySoftwareArtifacts } from "./software-artifacts.ts";
 
 export const proofCardInputSchema = z.object({
   aspName: z.string().min(1),
@@ -36,13 +37,22 @@ export const signedProofCardSchema = z.object({
     }),
   ),
   risks: z.array(z.string()),
+  softwareEvidence: z
+    .object({
+      repoUrls: z.array(z.string()),
+      deploymentUrls: z.array(z.string()),
+      packageEvidence: z.array(z.string()),
+      testEvidence: z.array(z.string()),
+      buildEvidence: z.array(z.string()),
+    })
+    .optional(),
   buyerMessage: z.string(),
 });
 
 export type ProofCardInput = z.infer<typeof proofCardInputSchema>;
 export type SignedProofCard = z.infer<typeof signedProofCardSchema>;
 
-export function createSignedProofCard(input: ProofCardInput): SignedProofCard {
+export async function createSignedProofCard(input: ProofCardInput): Promise<SignedProofCard> {
   const parsed = proofCardInputSchema.parse(input);
   const deal = extractDealFromConversation({
     conversation: parsed.taskText,
@@ -60,12 +70,20 @@ export function createSignedProofCard(input: ProofCardInput): SignedProofCard {
     submittedAt: new Date().toISOString(),
   };
   const scorecard = scoreSubmission(submission, deal.acceptanceCriteria);
+  const enriched = await enrichScorecard({
+    scorecard,
+    category: deal.category,
+    taskText: parsed.taskText,
+    deliveryText: parsed.deliveryText,
+    artifacts: submission.artifacts,
+    sources: submission.sources,
+  });
   const unsigned = {
     id: `proof-${randomUUID()}`,
     aspName: parsed.aspName,
     category: deal.category,
-    verdict: scorecard.verdict,
-    score: scorecard.score,
+    verdict: enriched.scorecard.verdict,
+    score: enriched.scorecard.score,
     taskHash: deal.taskHash,
     deliveryHash: deal.deliveryHash,
     artifactHashes: hashArtifacts(submission.artifacts),
@@ -74,13 +92,56 @@ export function createSignedProofCard(input: ProofCardInput): SignedProofCard {
     issuedAt: new Date().toISOString(),
     signatureAlgorithm: "HMAC-SHA256" as const,
     acceptanceCriteria: deal.acceptanceCriteria,
-    checks: [...scorecard.checks],
-    risks: [...scorecard.risks],
-    buyerMessage: buildBuyerMessage(scorecard),
+    checks: [...enriched.scorecard.checks],
+    risks: [...enriched.scorecard.risks],
+    softwareEvidence: enriched.softwareEvidence,
+    buyerMessage: buildBuyerMessage(enriched.scorecard),
   };
   return {
     ...unsigned,
     signature: signProofPayload(unsigned),
+  };
+}
+
+async function enrichScorecard(input: {
+  readonly scorecard: ScoreCard;
+  readonly category: string;
+  readonly taskText: string;
+  readonly deliveryText: string;
+  readonly artifacts: readonly string[];
+  readonly sources: readonly string[];
+}): Promise<{
+  readonly scorecard: ScoreCard;
+  readonly softwareEvidence?: SignedProofCard["softwareEvidence"];
+}> {
+  if (input.category !== "software") return { scorecard: input.scorecard };
+
+  const softwareReport = await verifySoftwareArtifacts({
+    taskText: input.taskText,
+    deliveryText: input.deliveryText,
+    artifacts: input.artifacts,
+    sources: input.sources,
+  });
+  const checks = [...input.scorecard.checks, ...softwareReport.checks];
+  const risks = Array.from(new Set([...input.scorecard.risks, ...softwareReport.risks]));
+  const score = Math.round(checks.reduce((total, check) => total + check.score, 0) / checks.length);
+  const verdict = score >= 82 && risks.length <= 1 ? "approve" : score >= 58 ? "revise" : "reject";
+
+  return {
+    scorecard: {
+      ...input.scorecard,
+      score,
+      verdict,
+      checks,
+      risks,
+    },
+    softwareEvidence: {
+      repoUrls: [...softwareReport.evidence.repoUrls],
+      deploymentUrls: [...softwareReport.evidence.deploymentUrls],
+      packageEvidence: [...softwareReport.evidence.packageEvidence],
+      testEvidence: [...softwareReport.evidence.testEvidence],
+      buildEvidence: [...softwareReport.evidence.buildEvidence],
+    },
   };
 }
 

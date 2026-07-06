@@ -29,25 +29,7 @@ export async function readProofCard(id: string) {
     if (!record) {
       throw new Error(`Proof card not found: ${id}`);
     }
-    return signedProofCardSchema.parse({
-      id: record.id,
-      aspName: record.aspName,
-      category: record.category,
-      verdict: record.verdict,
-      score: record.score,
-      taskHash: record.taskHash,
-      deliveryHash: record.deliveryHash,
-      artifactHashes: JSON.parse(record.artifactHashesJson),
-      sourceHashes: JSON.parse(record.sourceHashesJson),
-      verifierVersion: record.verifierVersion,
-      issuedAt: record.issuedAt.toISOString(),
-      signatureAlgorithm: record.signatureAlgorithm,
-      signature: record.signature,
-      acceptanceCriteria: JSON.parse(record.acceptanceCriteria),
-      checks: JSON.parse(record.checksJson),
-      risks: JSON.parse(record.risksJson),
-      buyerMessage: record.buyerMessage,
-    });
+    return signedProofCardSchema.parse(JSON.parse(record.proofPackJson));
   }
 
   const data = await readFile(proofPath(id), "utf8");

@@ -7,7 +7,7 @@ export default defineTool({
     "Create a signed, timestamped ProofArena proof card for an OKX.AI ASP delivery and return its local proof URL.",
   inputSchema: proofCardInputSchema,
   async execute(input) {
-    const card = await saveProofCard(createSignedProofCard(input));
+    const card = await saveProofCard(await createSignedProofCard(input));
     return {
       card,
       proofUrl: `/proof/${card.id}`,

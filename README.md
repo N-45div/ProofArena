@@ -71,6 +71,12 @@ When `DATABASE_URL` is set, proof cards are persisted through Prisma. Without
 `DATABASE_URL`, the app falls back to local ignored JSON files under
 `.proofarena/`.
 
+For software ASP deliveries, ProofArena extracts repository URLs, deployment
+URLs, package/install evidence, and build/test evidence into the signed card.
+Set `PROOFARENA_LIVE_URL_CHECKS=1` to perform live HEAD checks for repo and
+deployment URLs; otherwise the card records detected URLs without claiming they
+responded.
+
 ## Benchmarks
 
 ```bash

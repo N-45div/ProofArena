@@ -65,8 +65,8 @@ Delivery: Repo https://github.com/example/proof-demo. README.md included. No dep
   },
   {
     id: "signed-proof-card-verifies",
-    run() {
-      const card = createSignedProofCard({
+    async run() {
+      const card = await createSignedProofCard({
         aspName: "BuildSmith",
         taskText:
           "Buyer: Build a Next.js dashboard with GitHub repo, deployed URL, mobile screenshots, and test logs.",
@@ -81,16 +81,18 @@ Delivery: Repo https://github.com/example/proof-demo. README.md included. No dep
           card.taskHash.length === 64 &&
           card.deliveryHash.length === 64 &&
           card.signature.length === 64 &&
-          card.verdict === "revise",
+          card.verdict === "revise" &&
+          card.softwareEvidence?.repoUrls.length === 1 &&
+          card.checks.some((check) => check.label === "Deployment proof" && !check.passed),
         observed: card,
       };
     },
   },
 ];
 
-const results = cases.map((testCase) => {
+const results = await Promise.all(cases.map(async (testCase) => {
   try {
-    return { id: testCase.id, ...testCase.run() };
+    return { id: testCase.id, ...(await testCase.run()) };
   } catch (error) {
     return {
       id: testCase.id,
@@ -98,7 +100,7 @@ const results = cases.map((testCase) => {
       error: error instanceof Error ? error.message : String(error),
     };
   }
-});
+}));
 
 const summary = {
   suite: "proofarena-verifier",

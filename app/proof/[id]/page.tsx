@@ -86,6 +86,20 @@ export default async function ProofPage({ params }: { readonly params: Promise<{
             Risks: {card.risks.join(", ")}
           </section>
         ) : null}
+
+        {card.softwareEvidence ? (
+          <section className="rounded-lg border bg-card">
+            <div className="border-border border-b px-4 py-3">
+              <h2 className="font-medium">Software evidence</h2>
+            </div>
+            <div className="grid gap-4 p-4 text-sm md:grid-cols-2">
+              <EvidenceList label="Repositories" values={card.softwareEvidence.repoUrls} />
+              <EvidenceList label="Deployments" values={card.softwareEvidence.deploymentUrls} />
+              <EvidenceList label="Package/install" values={card.softwareEvidence.packageEvidence} />
+              <EvidenceList label="Build/test" values={[...card.softwareEvidence.buildEvidence, ...card.softwareEvidence.testEvidence]} />
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );
@@ -105,6 +119,23 @@ function HashRow({ label, value }: { readonly label: string; readonly value: str
     <div>
       <p className="text-muted-foreground">{label}</p>
       <p className="mt-1 break-all font-mono text-xs">{value}</p>
+    </div>
+  );
+}
+
+function EvidenceList({ label, values }: { readonly label: string; readonly values: readonly string[] }) {
+  return (
+    <div>
+      <p className="font-medium">{label}</p>
+      {values.length > 0 ? (
+        <ul className="mt-2 grid gap-1 text-muted-foreground">
+          {values.map((value) => (
+            <li className="break-all" key={value}>{value}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-muted-foreground">No evidence detected.</p>
+      )}
     </div>
   );
 }
