@@ -120,6 +120,25 @@ Delivery: Repo https://github.com/example/proof-demo. README.md included. No dep
       };
     },
   },
+  {
+    id: "benchmark-log-counts-as-test-evidence",
+    async run() {
+      const card = await createSignedProofCard({
+        aspName: "ProofArena",
+        taskText: "Buyer: Provide repo, deployed URL, package evidence, build log, and verifier benchmark output.",
+        deliveryText:
+          "Delivery: Repo https://github.com/N-45div/ProofArena. Deployment https://proofarena-two.vercel.app. package.json included. npm run build passed. npm run benchmark:verifier passed.",
+        artifacts: ["package.json", "build-log.txt", "benchmark-log.txt"],
+        sources: ["https://github.com/N-45div/ProofArena", "https://proofarena-two.vercel.app"],
+      });
+      return {
+        passed:
+          card.softwareEvidence?.testEvidence.some((value) => value.includes("benchmark")) &&
+          card.checks.some((check) => check.label === "Build/test evidence" && check.passed),
+        observed: card.softwareEvidence,
+      };
+    },
+  },
 ];
 
 const results = await Promise.all(cases.map(async (testCase) => {

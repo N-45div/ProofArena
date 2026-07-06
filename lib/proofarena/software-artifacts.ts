@@ -37,7 +37,7 @@ export async function verifySoftwareArtifacts(input: {
   );
   const testEvidence = unique(
     [...input.artifacts, input.deliveryText].filter((value) =>
-      /\b(test|tests|vitest|jest|playwright|cypress|test-log|coverage)\b/i.test(value),
+      /\b(test|tests|vitest|jest|playwright|cypress|test-log|coverage|benchmark|benchmarks|benchmark-log|verifier)\b/i.test(value),
     ),
   );
   const buildEvidence = unique(
