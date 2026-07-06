@@ -37,6 +37,7 @@ service is live.
 ```bash
 npm install
 cp .env.example .env.local
+npm run prisma:migrate
 npm run eve:info
 npm run dev
 ```
@@ -65,6 +66,10 @@ The primary app flow is now ASP-side:
 2. paste the ASP delivery and artifacts
 3. generate a signed proof card
 4. attach the proof URL and buyer message to the OKX.AI delivery
+
+When `DATABASE_URL` is set, proof cards are persisted through Prisma. Without
+`DATABASE_URL`, the app falls back to local ignored JSON files under
+`.proofarena/`.
 
 ## Benchmarks
 

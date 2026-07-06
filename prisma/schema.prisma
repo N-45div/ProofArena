@@ -48,14 +48,27 @@ model VerifierRun {
 }
 
 model ProofCard {
-  id             String   @id @default(cuid())
-  arenaId        String
-  aspName        String
-  score          Int
-  verdict        String
-  proofPackJson  String
-  createdAt      DateTime @default(now())
-  arena          Arena    @relation(fields: [arenaId], references: [id])
+  id                 String   @id
+  arenaId            String?
+  aspName            String
+  category           String
+  score              Int
+  verdict            String
+  taskHash           String
+  deliveryHash       String
+  artifactHashesJson String
+  sourceHashesJson   String
+  verifierVersion    String
+  issuedAt           DateTime
+  signatureAlgorithm String
+  signature          String
+  acceptanceCriteria String
+  checksJson         String
+  risksJson          String
+  buyerMessage       String
+  proofPackJson      String
+  createdAt          DateTime @default(now())
+  arena              Arena?   @relation(fields: [arenaId], references: [id])
 }
 
 model EvaluatorVote {
