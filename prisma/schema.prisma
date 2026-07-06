@@ -69,6 +69,11 @@ model ProofCard {
   proofPackJson      String
   createdAt          DateTime @default(now())
   arena              Arena?   @relation(fields: [arenaId], references: [id])
+
+  @@index([aspName])
+  @@index([category])
+  @@index([verdict])
+  @@index([issuedAt])
 }
 
 model EvaluatorVote {

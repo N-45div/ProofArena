@@ -4,6 +4,7 @@ import { extractDealFromConversation } from "../lib/proofarena/deal-parser.ts";
 import { evaluateArena, scoreSubmission } from "../lib/proofarena/evaluator.ts";
 import { VERIFIER_VERSION } from "../lib/proofarena/learning.ts";
 import { createSignedProofCard, verifyProofCard } from "../lib/proofarena/proof-card.ts";
+import { getAspProofProfileFromCards } from "../lib/proofarena/asp-profile.ts";
 
 const cases = [
   {
@@ -85,6 +86,37 @@ Delivery: Repo https://github.com/example/proof-demo. README.md included. No dep
           card.softwareEvidence?.repoUrls.length === 1 &&
           card.checks.some((check) => check.label === "Deployment proof" && !check.passed),
         observed: card,
+      };
+    },
+  },
+  {
+    id: "asp-profile-aggregates-proof-history",
+    async run() {
+      const cards = [
+        await createSignedProofCard({
+          aspName: "BuildSmith",
+          taskText: "Buyer: Build a Next.js dashboard with repo, deployment, package.json, build log, and tests.",
+          deliveryText:
+            "Delivery: Repo https://github.com/example/proof-demo. Deployment https://proof-demo.example.com. package.json, build-log.txt, and test-log.txt included.",
+          artifacts: ["package.json", "build-log.txt", "test-log.txt"],
+          sources: ["https://github.com/example/proof-demo", "https://proof-demo.example.com"],
+        }),
+        await createSignedProofCard({
+          aspName: "BuildSmith",
+          taskText: "Buyer: Build a Next.js dashboard with GitHub repo, deployed URL, and test logs.",
+          deliveryText:
+            "Delivery: Repo https://github.com/example/proof-demo. README.md included. Deployment and test logs are coming later.",
+          artifacts: ["README.md"],
+          sources: ["https://github.com/example/proof-demo"],
+        }),
+      ];
+      const profile = getAspProofProfileFromCards("BuildSmith", cards);
+      return {
+        passed:
+          profile.totalCards === 2 &&
+          profile.categories.some((category) => category.category === "software") &&
+          profile.revisionRate > 0,
+        observed: profile,
       };
     },
   },

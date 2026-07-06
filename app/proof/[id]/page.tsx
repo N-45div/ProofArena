@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { BadgeCheckIcon, CircleAlertIcon, CopyIcon, ShieldCheckIcon } from "lucide-react";
 import { readProofCard } from "@/lib/proofarena/proof-store";
 import { verifyProofCard } from "@/lib/proofarena/proof-card";
@@ -17,6 +18,12 @@ export default async function ProofPage({ params }: { readonly params: Promise<{
             <div>
               <p className="text-muted-foreground text-sm">ProofArena signed proof card</p>
               <h1 className="mt-1 font-semibold text-3xl tracking-normal">{card.aspName}</h1>
+              <Link
+                className="mt-2 inline-flex text-muted-foreground text-sm underline-offset-4 hover:text-foreground hover:underline"
+                href={`/asp/${encodeURIComponent(card.aspName)}`}
+              >
+                View ASP proof history
+              </Link>
             </div>
             <div
               className={
