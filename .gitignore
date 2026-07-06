@@ -3,8 +3,10 @@ node_modules
 .eve
 .output
 .vercel
+.agents
 .internal
 .proofarena
+skills-lock.json
 .env
 .env.local
 .env.*.local
