@@ -1,0 +1,15 @@
+[Unit]
+Description=ProofArena OKX A2A responder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/proofarena
+Environment=PATH=%h/.nvm/versions/node/v23.11.0/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.nvm/versions/node/v23.11.0/bin/okx-a2a run --ai-provider codex
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
